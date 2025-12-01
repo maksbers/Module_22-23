@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class InputExample : MonoBehaviour
+public class ControllersSwitcher : MonoBehaviour
 {
     [SerializeField] private Character _character;
 
@@ -15,7 +15,7 @@ public class InputExample : MonoBehaviour
         */
 
         _characterController = new CompositeController(
-            new TargetDirectionalMovableController(_character),
+            new TargetDirectionalMovableController(_character, _character.GroundLayer),
             new AlongMovableVelocityRotatableController(_character, _character));
 
         _characterController.Enable();

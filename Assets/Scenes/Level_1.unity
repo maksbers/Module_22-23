@@ -1836,7 +1836,7 @@ GameObject:
   - component: {fileID: 1064353880}
   - component: {fileID: 1064353879}
   - component: {fileID: 1064353878}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3653,6 +3653,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 5
   _rotationSpeed: 600
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
 --- !u!1 &1804451642
 GameObject:
   m_ObjectHideFlags: 0
