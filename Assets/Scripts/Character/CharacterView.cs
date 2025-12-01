@@ -25,5 +25,4 @@ public class CharacterView : MonoBehaviour
     {
         _animator.SetBool(IsRunningKey, false);
     }
-
 }
