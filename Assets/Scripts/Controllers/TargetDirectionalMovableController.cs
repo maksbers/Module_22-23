@@ -3,52 +3,52 @@ using UnityEngine;
 public class TargetDirectionalMovableController : Controller
 {
     private IDirectionalMovable _movable;
+    private InputController _inputController;
 
-    private Vector3 _targetPosition;
-    private bool _hasTarget = false;
-
-    private LayerMask _groundLayer;
+    private Vector3 _currentTarget;
+    private bool _isMoving;
 
 
-    public TargetDirectionalMovableController(IDirectionalMovable movable, LayerMask groundLayer)
+    public TargetDirectionalMovableController(IDirectionalMovable movable, InputController inputController)
     {
         _movable = movable;
-        _groundLayer = groundLayer;
+        _inputController = inputController;
+
+        _currentTarget = _inputController.TargetPosition;
     }
 
     protected override void UpdateLogic(float deltaTime)
     {
-        if (Input.GetMouseButtonDown(0))
+        if (_inputController.TargetPosition != _currentTarget)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, _groundLayer))
-            {
-                _targetPosition = hitInfo.point;
-                _targetPosition.y = 0f;
-
-                _hasTarget = true;
-            }
+            _currentTarget = _inputController.TargetPosition;
+            _isMoving = true;
         }
 
-        if (_hasTarget)
+        if (_isMoving == false)
         {
-            Debug.DrawLine(_movable.CurrentPosition, _targetPosition, Color.red);
-            Debug.DrawRay(_targetPosition, Vector3.up * 2f, Color.green);
-        }
-
-        if (_hasTarget == false)
             return;
+        }
 
-        Vector3 directionToTarget = (_targetPosition - _movable.CurrentPosition).normalized;
+        Vector3 directionToTarget = CalculateDirectionToTarget();
         _movable.SetMoveDirection(directionToTarget);
 
-        float distanceToTarget = Vector3.Distance(_movable.CurrentPosition, _targetPosition);
+        float distanceToTarget = CalculateDistanceToTarget();
 
         if (distanceToTarget < 0.2f)
         {
             _movable.SetMoveDirection(Vector3.zero);
-            _hasTarget = false;
+            _isMoving = false;
         }
+    }
+
+    private float CalculateDistanceToTarget()
+    {
+        return Vector3.Distance(_movable.CurrentPosition, _currentTarget);
+    }
+
+    private Vector3 CalculateDirectionToTarget()
+    {
+        return (_currentTarget - _movable.CurrentPosition).normalized;
     }
 }
