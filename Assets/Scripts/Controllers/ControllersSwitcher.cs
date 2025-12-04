@@ -5,53 +5,47 @@ public class ControllersSwitcher : MonoBehaviour
 {
     [SerializeField] private Character _character;
 
-    private Controller _characterController;
+    private Controller _manualCharacterController;
+    private Controller _autoCharacterController;
+    private Controller _currentController;
 
     private InputController _inputController;
 
-    private NavMeshPath _path;
+    private float _switchTime = 3f;
+
 
     private void Awake()
     {
-        _path = new NavMeshPath();
-
         _inputController = new InputController(_character.GroundLayer);
 
-        /*
-        _characterController = new CompositeController(
+        _autoCharacterController = new CompositeController(
             new RandomDirectionalMovableController(_character, 2f),
             new AlongMovableVelocityRotatableController(_character, _character));
-        */
 
-        _characterController = new CompositeController(
-            new TargetDirectionalMovableController(_character, _inputController),
+        NavMeshQueryFilter queryFilter = new NavMeshQueryFilter();
+        queryFilter.agentTypeID = 0;
+        queryFilter.areaMask = NavMesh.AllAreas;
+
+        _manualCharacterController = new CompositeController(
+            new TargetDirectionalMovableController(_character, _inputController, queryFilter),
             new AlongMovableVelocityRotatableController(_character, _character));
 
         _inputController.Enable();
-        _characterController.Enable();
+        _manualCharacterController.Enable();
+        _autoCharacterController.Enable();
     }
 
     private void Update()
     {
         _inputController.Update(Time.deltaTime);
-        _characterController.Update(Time.deltaTime);
+
+        if (IsManualControlActive())
+            _currentController = _manualCharacterController;
+        else
+            _currentController = _autoCharacterController;
+
+        _currentController.Update(Time.deltaTime);
     }
 
-    private void OnDrawGizmosSelected()
-    {
-        NavMeshQueryFilter queryFilter = new NavMeshQueryFilter();
-        queryFilter.agentTypeID = 0;
-        queryFilter.areaMask = NavMesh.AllAreas;
-
-        NavMesh.CalculatePath(_character.CurrentPosition, _inputController.TargetPosition, queryFilter, _path);
-
-        if (_path.status != NavMeshPathStatus.PathInvalid)
-        {
-            foreach (Vector3 corner in _path.corners)
-            {
-                Gizmos.color = Color.red;
-                Gizmos.DrawSphere(corner, 0.2f);
-            }
-        }
-    }
+    private bool IsManualControlActive() => _inputController.TimeSinceLastClick < _switchTime;
 }

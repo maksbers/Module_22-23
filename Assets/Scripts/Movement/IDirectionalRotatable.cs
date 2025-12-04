@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public interface IDirectionalRotatable
+public interface IDirectionalRotatable : ITransformPosition
 {
     Quaternion CurrentRotation { get; }
 

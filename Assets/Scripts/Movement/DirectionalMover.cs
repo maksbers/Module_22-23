@@ -19,9 +19,9 @@ public class DirectionalMover
     public void SetInputDirection(Vector3 direction) => _currentDirection = direction;
 
 
-    public void Update(float deltaTime)
+    public void Update(float deltaTime, float speedModifier = 1)
     {
-        CurrentVelocity = _currentDirection.normalized * _movementSpeed;
+        CurrentVelocity = _currentDirection.normalized * (_movementSpeed * speedModifier);
 
         _characterController.Move(CurrentVelocity * deltaTime);
     }

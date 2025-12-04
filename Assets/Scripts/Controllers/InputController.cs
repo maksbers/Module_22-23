@@ -5,6 +5,10 @@ public class InputController : Controller
     private Vector3 _targetPosition;
     private LayerMask _groundLayer;
 
+    private float _timeSinceLastClick = 0f;
+
+    public float TimeSinceLastClick => _timeSinceLastClick;
+
     public InputController(LayerMask groundLayer)
     {
         _groundLayer = groundLayer;
@@ -15,8 +19,11 @@ public class InputController : Controller
 
     protected override void UpdateLogic(float deltaTime)
     {
+        _timeSinceLastClick += deltaTime;
+
         if (Input.GetMouseButtonDown(0))
         {
+            _timeSinceLastClick = 0f;
             UpdateTarget();
         }
     }
