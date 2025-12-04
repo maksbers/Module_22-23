@@ -1,31 +1,39 @@
 using UnityEngine;
+using UnityEngine.AI;
 
-public class RandomDirectionalMovableController : Controller
+public class RandomDirectionalMovableController : NavMeshMovementController
 {
-    private IDirectionalMovable _movable;
+    private readonly float _timeToChangeDirection = 2f;
+    private readonly float _moveRadius = 5f;
 
-    private float _time;
-    private float _timeToChangeDirection;
+    private float _timer;
 
-    private Vector3 _inputDirection;
-
-    public RandomDirectionalMovableController(IDirectionalMovable movable, float timeToChangeDirection)
+    public RandomDirectionalMovableController(
+        IDirectionalMovable movable,
+        NavMeshQueryFilter queryFilter) : base(movable, queryFilter)
     {
-        _movable = movable;
-        _timeToChangeDirection = timeToChangeDirection;
+        SetNewRandomTarget();
     }
 
     protected override void UpdateLogic(float deltaTime)
     {
-        _time += deltaTime;
+        _timer += deltaTime;
 
-        if (_time >= _timeToChangeDirection)
+        if (_timer >= _timeToChangeDirection)
         {
-            _inputDirection = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
-
-            _time = 0f;
+            SetNewRandomTarget();
+            _timer = 0f;
         }
 
-        _movable.SetMoveDirection(_inputDirection);
+        base.UpdateLogic(deltaTime);
+    }
+
+    private void SetNewRandomTarget()
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * _moveRadius;
+        randomDirection += Movable.Position;
+
+        if (NavMesh.SamplePosition(randomDirection, out NavMeshHit hit, _moveRadius, QueryFilter))
+            SetTargetPosition(hit.position);
     }
 }

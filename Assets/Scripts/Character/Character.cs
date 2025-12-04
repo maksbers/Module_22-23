@@ -16,11 +16,12 @@ public class Character : MonoBehaviour, IDirectionalMovable, IDirectionalRotatab
 
     [SerializeField] private LayerMask _groundLayer;
 
-    private bool _hasUnprocessedDamage;
+    private bool _isDamageTaken;
 
     public Vector3 CurrentVelocity => _mover.CurrentVelocity;
     public Quaternion CurrentRotation => _rotator.CurrentRotation;
     public LayerMask GroundLayer => _groundLayer;
+
     public Vector3 Position => transform.position;
 
     public float Health => _healthSystem.CurrentHealth;
@@ -61,18 +62,17 @@ public class Character : MonoBehaviour, IDirectionalMovable, IDirectionalRotatab
 
     public float TakeDamage(float damageAmount)
     {
-        _hasUnprocessedDamage = true;
+        _isDamageTaken = true;
 
         return _healthSystem.TakeDamage(damageAmount);
     }
 
-    public bool TryConsumeDamageFlag()
+    public bool TryGetDamageTaken()
     {
-        if (_hasUnprocessedDamage == false)
+        if (_isDamageTaken == false)
             return false;
 
-        _hasUnprocessedDamage = false;
+        _isDamageTaken = false;
         return true;
     }
-
 }

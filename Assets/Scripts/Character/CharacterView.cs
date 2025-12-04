@@ -35,7 +35,7 @@ public class CharacterView : MonoBehaviour
             return;
         }
 
-        if (_character.TryConsumeDamageFlag())
+        if (_character.TryGetDamageTaken())
         {
             _animator.SetTrigger(IsAttacked);
         }

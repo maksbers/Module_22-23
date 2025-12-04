@@ -2,18 +2,20 @@ using UnityEngine;
 
 public class InputController : Controller
 {
+    private GroundClickRaycaster _raycaster;
+
     private Vector3 _targetPosition;
-    private LayerMask _groundLayer;
+    private bool _hasNewTarget;
 
     private float _timeSinceLastClick = 0f;
 
-    public float TimeSinceLastClick => _timeSinceLastClick;
-
-    public InputController(LayerMask groundLayer)
+    public InputController(GroundClickRaycaster raycaster)
     {
-        _groundLayer = groundLayer;
+        _raycaster = raycaster;
     }
 
+    public float TimeSinceLastClick => _timeSinceLastClick;
+    public bool HasNewTarget => _hasNewTarget;
     public Vector3 TargetPosition => _targetPosition;
 
 
@@ -24,23 +26,20 @@ public class InputController : Controller
         if (Input.GetMouseButtonDown(0))
         {
             _timeSinceLastClick = 0f;
-            UpdateTarget();
+
+            Vector3 point = _raycaster.GetGroundPoint();
+
+            if (point != Vector3.zero)
+            {
+                _targetPosition = point;
+                _hasNewTarget = true;
+            }
         }
     }
 
-    private void UpdateTarget()
+    public Vector3 TakeTarget()
     {
-        Ray ray = GetCameraRay();
-
-        if (Physics.Raycast(ray, out RaycastHit hitInfo, Mathf.Infinity, _groundLayer))
-        {
-            _targetPosition = hitInfo.point;
-            _targetPosition.y = 0f;
-        }
-    }
-
-    private Ray GetCameraRay()
-    {
-        return Camera.main.ScreenPointToRay(Input.mousePosition);
+        _hasNewTarget = false;
+        return _targetPosition;
     }
 }
